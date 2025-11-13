@@ -1,0 +1,39 @@
+
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        VITE_APP_FIREBASE_API: ${VITE_APP_FIREBASE_API}
+        VITE_APP_FIREBASE_AUTH_DOMAIN: ${VITE_APP_FIREBASE_AUTH_DOMAIN}
+        VITE_APP_FIREBASE_PROJECT_ID: ${VITE_APP_FIREBASE_PROJECT_ID}
+        VITE_APP_FIREBASE_STORAGE_BUCKET: ${VITE_APP_FIREBASE_STORAGE_BUCKET}
+        VITE_APP_FIREBASE_MESSAGING_SENDER_ID: ${VITE_APP_FIREBASE_MESSAGING_SENDER_ID}
+        VITE_APP_FIREBASE_APP_ID: ${VITE_APP_FIREBASE_APP_ID}
+        VITE_APP_FIREBASE_MEASUREMENT_ID: ${VITE_APP_FIREBASE_MEASUREMENT_ID}
+    image: yourdockerid/learnify-web:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+  api:
+    build: ./api
+    image: yourdockerid/learnify-api:latest
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/learnify
+      - PORT=8080
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
