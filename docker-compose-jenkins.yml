@@ -1,29 +1,42 @@
 version: "3.9"
 
 services:
+
   frontend-jenkins:
     image: node:18-alpine
     working_dir: /app
     volumes:
       - ./:/app
       - /app/node_modules
+    command: >
+      sh -c "npm install &&
+             npm run build &&
+             npm install -g serve &&
+             serve -s dist -l 4173"
     ports:
       - "5174:4173"
-    command: sh -c "npm install -g serve && npm install && npm run build && serve -s dist -l 4173"
     environment:
-      CLIENT_URL=http://15.207.18.78:5174
+      VITE_APP_FIREBASE_API: "${VITE_APP_FIREBASE_API}"
+      VITE_APP_FIREBASE_AUTH_DOMAIN: "${VITE_APP_FIREBASE_AUTH_DOMAIN}"
+      VITE_APP_FIREBASE_PROJECT_ID: "${VITE_APP_FIREBASE_PROJECT_ID}"
+      VITE_APP_FIREBASE_STORAGE_BUCKET: "${VITE_APP_FIREBASE_STORAGE_BUCKET}"
+      VITE_APP_FIREBASE_MESSAGING_SENDER_ID: "${VITE_APP_FIREBASE_MESSAGING_SENDER_ID}"
+      VITE_APP_FIREBASE_APP_ID: "${VITE_APP_FIREBASE_APP_ID}"
+      VITE_APP_FIREBASE_MEASUREMENT_ID: "${VITE_APP_FIREBASE_MEASUREMENT_ID}"
+      CLIENT_URL: "http://15.207.18.78:5174"
 
   backend-jenkins:
     image: node:18-alpine
     working_dir: /api
     volumes:
       - ./api:/api
-      - /api/node_modules
+    command: >
+      sh -c "npm install &&
+             npm start"
     ports:
       - "3001:8080"
-    command: sh -c 'npm install && npm run start'
     environment:
-      MONGO_URL=mongodb://mongo-jenkins:27017/Learnify
+      MONGO_URL: "mongodb://mongo-jenkins:27017/learnify"
 
   mongo-jenkins:
     image: mongo:6
